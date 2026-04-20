@@ -1,0 +1,300 @@
+{% extends 'base.html' %}
+{% load static %}
+<script>
+    function setReply(id) {
+        document.getElementById("parent_id").value = id;
+    }
+</script>
+{% block main %}
+
+<!-- Breaking News Start -->
+<div class="container-fluid mt-5 mb-3 pt-3">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-12">
+                <div class="d-flex justify-content-between">
+                    <div class="section-title border-right-0 mb-0" style="width: 180px;">
+                        <h4 class="m-0 text-uppercase font-weight-bold">Tranding</h4>
+                    </div>
+                    <div class="owl-carousel tranding-carousel position-relative d-inline-flex align-items-center bg-white border border-left-0"
+                        style="width: calc(100% - 180px); padding-right: 100px;">
+                        <div class="text-truncate"><a class="text-secondary text-uppercase font-weight-semi-bold"
+                                href="">Lorem ipsum dolor sit amet elit. Proin interdum lacus eget ante tincidunt, sed
+                                faucibus nisl sodales</a></div>
+                        <div class="text-truncate"><a class="text-secondary text-uppercase font-weight-semi-bold"
+                                href="">Lorem ipsum dolor sit amet elit. Proin interdum lacus eget ante tincidunt, sed
+                                faucibus nisl sodales</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breaking News End -->
+
+
+<!-- News With Sidebar Start -->
+<div class="container-fluid">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- News Detail Start -->
+                <div class="position-relative mb-3">
+                    <img class="img-fluid w-100" src="{{ news.image.url }}" style="object-fit: cover;">
+                    <div class="bg-white border border-top-0 p-4">
+                        <div class="mb-3">
+                            <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2"
+                                href="">{{ news.category.name }}</a>
+                            <a class="text-body" href="">{{ news.created_at|date:"M d, Y" }}</a>
+                        </div>
+                        <h1 class="mb-3 text-secondary text-uppercase font-weight-bold">{{ news.title }}</h1>
+                        <p>{{ news.content }}</p>
+                         {% for item in news.details.all %}
+
+                        {% if item.title %}
+                        <h3 class="text-uppercase font-weight-bold mb-3">{{ item.title }}</h3>
+                        {% endif %}
+                         {% if item.image %}
+                        <img class="img-fluid w-50 float-left mr-4 mb-2" src="{{ item.image.url }}">
+                        {% endif %}
+
+                        {% if item.text %}
+                        <p>{{ item.text }}</p>
+                        {% endif %}
+
+                        {% endfor %}
+                    </div>
+                    <div class="d-flex justify-content-between bg-white border border-top-0 p-4">
+                        <div class="d-flex align-items-center">
+                            <span class="ml-3"><i class="far fa-eye mr-2"></i>{{ news.views_count }} views</span>
+                            <span class="ml-3"><i class="far fa-comment mr-2"></i>{{ comments|length }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="section-title mb-0">
+                        <h4 class="m-0 text-uppercase font-weight-bold">{{ comments|length }} Comments</h4>
+                    </div>
+                    <div class="bg-white border border-top-0 p-4">
+                       {% for comment in comments %}
+
+<div class="media mb-4">
+    <img src="{% static 'img/user.jpg' %}"
+         class="img-fluid mr-3 mt-1"
+         style="width: 45px;">
+    <div class="media-body">
+        <h6>
+            <span class="text-secondary font-weight-bold">
+                {{ comment.name }}
+            </span>
+            <small><i>{{ comment.created_at|date:"d M Y" }}</i></small>
+        </h6>
+
+        <!-- TEXT -->
+        <p>{{ comment.text }}</p>
+
+        <!-- REPLY BUTTON -->
+            <button onclick="setReply({{ comment.id }})"
+                class="btn btn-sm btn-outline-secondary">
+            Reply
+        </button>
+
+
+        {% for reply in comment.replies.all %}
+        <div class="media mt-4">
+
+            <img src="{% static 'img/user.jpg' %}"
+                 class="img-fluid mr-3 mt-1"
+                 style="width: 45px;">
+
+            <div class="media-body">
+
+                <h6>
+                    <span class="text-secondary font-weight-bold">
+                        {{ reply.name }}
+                    </span>
+                    <small><i>{{ reply.created_at|date:"d M Y" }}</i></small>
+                </h6>
+
+                <p>{{ reply.text }}</p>
+
+                <button onclick="setReply({{ reply.id }})"
+                        class="btn btn-sm btn-outline-secondary">
+                    Reply
+                </button>
+
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endfor %}
+                    </div>
+                </div>
+                <!-- Comment List End -->
+
+                <!-- Comment Form Start -->
+                <div class="mb-3">
+                    <div class="section-title mb-0">
+                        <h4 class="m-0 text-uppercase font-weight-bold">Leave a comment</h4>
+                    </div>
+                    <div class="bg-white border border-top-0 p-4">
+                        {% if request.user.is_authenticated %}
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="parent_id" id="parent_id">
+                            <div class="form-row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="name">Name *</label>
+                                        <input type="text" class="form-control" id="name" name="name">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="email">Email *</label>
+                                        <input type="email" class="form-control" id="email" name="email">
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="message">Message *</label>
+                                <textarea name="text" class="form-control" placeholder="Message"></textarea>
+                            </div>
+                            <div class="form-group mb-0">
+                                <button type="submit" class="btn btn-primary">
+                            Send Comment
+                        </button>
+                            </div>
+                        </form>
+                        {% else %}
+                        <span>Ro'yxatdan o'ting va komment yozing <a href="{% url 'signin' %}">Sign in </a></span>
+                        {% endif %}
+                    </div>
+                </div>
+                <!-- Comment Form End -->
+            </div>
+<!-- bu yerda detail dagi o'ng taraf turip ti uncha shart emas-->
+            <div class="col-lg-4">
+                <!-- Social Follow Start -->
+                <div class="mb-3">
+                    <div class="section-title mb-0">
+                        <h4 class="m-0 text-uppercase font-weight-bold">Follow Us</h4>
+                    </div>
+                    <div class="bg-white border border-top-0 p-3">
+                        <a href="" class="d-block w-100 text-white text-decoration-none mb-3"
+                            style="background: #39569E;">
+                            <i class="fab fa-facebook-f text-center py-4 mr-3"
+                                style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                            <span class="font-weight-medium">12,345 Fans</span>
+                        </a>
+                        <a href="" class="d-block w-100 text-white text-decoration-none mb-3"
+                            style="background: #52AAF4;">
+                            <i class="fab fa-twitter text-center py-4 mr-3"
+                                style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                            <span class="font-weight-medium">12,345 Followers</span>
+                        </a>
+                        <a href="" class="d-block w-100 text-white text-decoration-none mb-3"
+                            style="background: #0185AE;">
+                            <i class="fab fa-linkedin-in text-center py-4 mr-3"
+                                style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                            <span class="font-weight-medium">12,345 Connects</span>
+                        </a>
+                        <a href="" class="d-block w-100 text-white text-decoration-none mb-3"
+                            style="background: #C8359D;">
+                            <i class="fab fa-instagram text-center py-4 mr-3"
+                                style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                            <span class="font-weight-medium">12,345 Followers</span>
+                        </a>
+                        <a href="" class="d-block w-100 text-white text-decoration-none mb-3"
+                            style="background: #DC472E;">
+                            <i class="fab fa-youtube text-center py-4 mr-3"
+                                style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                            <span class="font-weight-medium">12,345 Subscribers</span>
+                        </a>
+                        <a href="" class="d-block w-100 text-white text-decoration-none" style="background: #055570;">
+                            <i class="fab fa-vimeo-v text-center py-4 mr-3"
+                                style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                            <span class="font-weight-medium">12,345 Followers</span>
+                        </a>
+                    </div>
+                </div>
+                <!-- Social Follow End -->
+
+                <!-- Tranding News Start -->
+                <div class="mb-3">
+                    <div class="section-title mb-0">
+                        <h4 class="m-0 text-uppercase font-weight-bold">Tranding News</h4>
+                    </div>
+                    <div class="bg-white border border-top-0 p-3">
+                            {% for item in trending_news %}
+                            <div class="d-flex align-items-center bg-white mb-3" style="height: 110px;">
+                                <img class="img-fluid" src="{{ item.image.url }}" alt="" style="width: 110px;">
+                                <div class="w-100 h-100 px-3 d-flex flex-column justify-content-center border border-left-0">
+                                    <div class="mb-2">
+                                        <a class="badge badge-primary text-uppercase font-weight-semi-bold p-1 mr-2" href="">{{ item.category.name }}</a>
+                                        <a class="text-body" href=""><small>{{ item.created_at|date:"M d, Y" }}</small></a>
+                                    </div>
+                                    <a class="h6 m-0 text-secondary text-uppercase font-weight-bold" href="{% url 'detail' item.slug %}">{{ item.title }}</a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                    </div>
+                </div>
+                <!-- Popular News End -->
+
+                <!-- Newsletter Start -->
+                <div class="mb-3">
+                    <div class="section-title mb-0">
+                        <h4 class="m-0 text-uppercase font-weight-bold">Newsletter</h4>
+                    </div>
+                    <div class="bg-white text-center border border-top-0 p-3">
+                        <p>Aliqu justo et labore at eirmod justo sea erat diam dolor diam vero kasd</p>
+                        <div class="input-group mb-2" style="width: 100%;">
+                            <input type="text" class="form-control form-control-lg" placeholder="Your Email">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary font-weight-bold px-3">Sign Up</button>
+                            </div>
+                        </div>
+                        <small>Lorem ipsum dolor sit amet elit</small>
+                    </div>
+                </div>
+                <!-- Newsletter End -->
+
+                <!-- Tags Start -->
+                <div class="mb-3">
+                    <div class="section-title mb-0">
+                        <h4 class="m-0 text-uppercase font-weight-bold">Tags</h4>
+                    </div>
+                    <div class="bg-white border border-top-0 p-3">
+                        <div class="d-flex flex-wrap m-n1">
+                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Politics</a>
+                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Business</a>
+                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Corporate</a>
+                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Business</a>
+                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Health</a>
+                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Education</a>
+                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Science</a>
+                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Business</a>
+                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Foods</a>
+                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Travel</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tags End -->
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function setReply(id) {
+        document.getElementById("parent_id").value = id;
+    }
+</script>
+{% endblock main %}
